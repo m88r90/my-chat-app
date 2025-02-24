@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة الموظف</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { direction: rtl; text-align: right; }
+        #chat { height: 300px; overflow-y: scroll; }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">صفحة الموظف</h1>
+        <div id="chat" class="border p-3 mb-3"></div>
+        <input type="text" id="messageInput" class="form-control mb-3" placeholder="اكتب رسالتك...">
+        <button onclick="sendMessage()" class="btn btn-primary btn-block">إرسال</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const chatDiv = document.getElementById('chat');
+        const messageInput = document.getElementById('messageInput');
+
+        socket.on('receiveMessage', (message) => {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = message;
+            chatDiv.appendChild(messageElement);
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        });
+
+        socket.on('receiveImage', (image) => {
+            const imageElement = document.createElement('img');
+            imageElement.src = image;
+            imageElement.style.maxWidth = '100%';
+            chatDiv.appendChild(imageElement);
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        });
+
+        function sendMessage() {
+            const message = messageInput.value;
+            if (message) {
+                socket.emit('sendMessage', `الموظف: ${message}`);
+                messageInput.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
